@@ -25,7 +25,13 @@ type YAuth struct {
 }
 
 func (y YAuth) Client() *http.Client {
-	return y.config().Client(context.Background(), y.Token)
+	config := oauth2.Config{
+		ClientID:     y.ClientID,
+		ClientSecret: y.ClientSecret,
+		Endpoint:     yahoo.Endpoint,
+		RedirectURL:  redirectURL,
+	}
+	return config.Client(context.Background(), y.Token)
 }
 
 func (y YAuth) WriteToFile(filePath string) error {
@@ -41,17 +47,15 @@ func (y YAuth) WriteToFile(filePath string) error {
 	return nil
 }
 
-func (y YAuth) config() *oauth2.Config {
-	return &oauth2.Config{
+func (y *YAuth) fetchToken() error {
+	config := oauth2.Config{
 		ClientID:     y.ClientID,
 		ClientSecret: y.ClientSecret,
 		Endpoint:     yahoo.Endpoint,
 		RedirectURL:  redirectURL,
 	}
-}
 
-func (y *YAuth) fetchToken() error {
-	browserCallback := y.config().AuthCodeURL("")
+	browserCallback := config.AuthCodeURL("")
 	if err := webbrowser.Open(browserCallback); err != nil {
 		return err
 	}
@@ -60,7 +64,7 @@ func (y *YAuth) fetchToken() error {
 	fmt.Print("Enter verification code: ")
 	code, _ := reader.ReadString('\n')
 
-	token, err := y.config().Exchange(context.Background(), code)
+	token, err := config.Exchange(context.Background(), code)
 	if err != nil {
 		return err
 	}
