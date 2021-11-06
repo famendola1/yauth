@@ -1,4 +1,4 @@
-# YAuth for Go
+# Yahoo OAuth Client for Go
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/famendola1/yauth.svg)](https://pkg.go.dev/github.com/famendola1/yauth)
 
